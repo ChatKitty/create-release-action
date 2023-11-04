@@ -1,0 +1,35 @@
+name: 'Create Release'
+description: 'Composite action to create a release using semantic-release'
+inputs:
+  github-token:
+    description: 'The GitHub token to use for authentication'
+    required: true
+  working-directory:
+    description: 'The working directory for the action'
+    required: true
+    default: '.'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set up Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install semantic-release and plugins
+      run: npm install -g semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/github @semantic-release/exec
+      shell: bash
+
+    - name: Run Semantic Release
+      id: semantic-release
+      run: semantic-release
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      working-directory: ${{ inputs.working-directory }}
